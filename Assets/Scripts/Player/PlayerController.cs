@@ -12,13 +12,14 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
+    private Animator animator;
 
     #region movement variables
 
     [Header("Movement")]
     [SerializeField] private float speed = 8f;
     [SerializeField] private float distanceWallDetect = 0.05f;
-    [SerializeField] private float offsetYAxisWallDetect = 0.5f;
+    [SerializeField] private Vector2 offsetAxisWallDetect;
     private Vector2 direction;
 
     #endregion
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float startJumpPower = 5.6f;
     [SerializeField] private float holdJumpPowerPerFrame = 17f;
     [SerializeField] private float distanceGroundDetect = 0.2f; 
-    [SerializeField] private float offsetXAxisGroundDetect = 0.5f;
+    [SerializeField] private Vector2 offsetAxisGroundDetect;
     [SerializeField] private LayerMask groundLayer;
     private bool isJumping;
     #endregion
@@ -41,6 +42,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -82,6 +84,7 @@ public class PlayerController : MonoBehaviour
         Vector2 inputMovement = value.ReadValue<Vector2>();
         if (inputMovement.x > 0) sr.flipX = false;
         if (inputMovement.x < 0) sr.flipX = true;
+        animator.SetFloat("Velocity_normalize", Mathf.Abs(inputMovement.x));
         direction = new Vector2(inputMovement.x, 0);
     }
 
@@ -124,17 +127,17 @@ public class PlayerController : MonoBehaviour
     // Center of starter point to detect ground in X Axis
     private Vector3 StartPointToDetectGroundOrigin()
     {
-        return transform.position + Vector3.down * transform.localScale.y / 2;
+        return transform.position + Vector3.down * (transform.localScale.y / 2 + offsetAxisGroundDetect.y);
     }
 
     private Vector3 LeftStartPointToDetectGround()
     {
-        return StartPointToDetectGroundOrigin() + Vector3.left * offsetXAxisGroundDetect;
+        return StartPointToDetectGroundOrigin() + Vector3.left * offsetAxisGroundDetect.x;
     }
 
     private Vector3 RightStartPointToDetectGround()
     {
-        return StartPointToDetectGroundOrigin() + Vector3.right * offsetXAxisGroundDetect;
+        return StartPointToDetectGroundOrigin() + Vector3.right * offsetAxisGroundDetect.x;
     }
 
     #endregion
@@ -158,32 +161,32 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 StartLeftPointToDetectWallOrigin()
     {
-        return transform.position + Vector3.left * transform.localScale.x / 2;
+        return transform.position + Vector3.left * (transform.localScale.x / 2 + offsetAxisWallDetect.x);
     }
 
     private Vector3 StartRightPointToDetectWallOrigin()
     {
-        return transform.position + Vector3.right * transform.localScale.x / 2;
+        return transform.position + Vector3.right * (transform.localScale.x / 2 + offsetAxisWallDetect.x);
     }
 
     private Vector3 TopLeftStartPointToDetectWall()
     {
-        return StartLeftPointToDetectWallOrigin() + Vector3.up * offsetYAxisWallDetect;
+        return StartLeftPointToDetectWallOrigin() + Vector3.up * offsetAxisWallDetect.y;
     }
 
     private Vector3 BottomLeftStartPointToDetectWall()
     {
-        return StartLeftPointToDetectWallOrigin() + Vector3.down * offsetYAxisWallDetect;
+        return StartLeftPointToDetectWallOrigin() + Vector3.down * offsetAxisWallDetect.y;
     }
 
     private Vector3 TopRightStartPointToDetectWall()
     {
-        return StartRightPointToDetectWallOrigin() + Vector3.up * offsetYAxisWallDetect;
+        return StartRightPointToDetectWallOrigin() + Vector3.up * offsetAxisWallDetect.y;
     }
 
     private Vector3 BottomRightStartPointToDetectWall()
     {
-        return StartRightPointToDetectWallOrigin() + Vector3.down * offsetYAxisWallDetect;
+        return StartRightPointToDetectWallOrigin() + Vector3.down * offsetAxisWallDetect.y;
     }
 
     #endregion
